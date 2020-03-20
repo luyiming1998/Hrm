@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lym.dao.DocumentMapper">
+    <resultMap id="documentmap" type="com.lym.entity.Document" autoMapping="true">
+        <id property="id" column="id"/>
+        <association property="user" javaType="com.lym.entity.User" autoMapping="true">
+            <id property="id" column="id1"/>
+        </association>
+    </resultMap>
+    <insert id="addDocument">
+        insert into document(title, filename, remark, create_date, user_id)
+        values (#{title}, #{filename}, #{remark}, #{create_date}, #{user_id})
+    </insert>
+
+    <select id="selectAllDocument" resultMap="documentmap">
+        select *
+        from document,
+        user
+        <where>
+            document.flag = 0
+            and document.id = user.id
+            <if test="title!=null">
+                and title like concat('%',#{title},'%')
+            </if>
+        </where>
+        limit #{start},10
+    </select>
+    <update id="delDocument">
+        update document
+        set flag=1
+        where id = #{id}
+    </update>
+    <select id="selectDocument" resultType="com.lym.entity.Document">
+        select *
+        from document
+        where id = #{id}
+    </select>
+    <update id="updateDocument">
+        update document
+        <set>
+            title=#{title},
+            remark=#{title},
+            <if test="filename!=null">
+                filename=#{filename}
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+    <select id="totalcountDocument" resultType="java.lang.Integer">
+        select count(1)
+        from document
+        <where>
+            flag=0
+            <if test="title!=null">
+                and title like concat('%',#{title},'%')
+            </if>
+        </where>
+    </select>
+</mapper>

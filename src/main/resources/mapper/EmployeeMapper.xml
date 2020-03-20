@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lym.dao.EmployeeMapper">
+    <resultMap id="deptmap" type="com.lym.entity.Dept" autoMapping="true">
+        <id property="id" column="id"/>
+    </resultMap>
+    <resultMap id="jobmap" type="com.lym.entity.Job" autoMapping="true">
+        <id property="id" column="id"/>
+    </resultMap>
+    <resultMap id="empmap" type="com.lym.entity.Employee" autoMapping="true">
+        <id property="id" column="id"/>
+        <association property="dept" javaType="com.lym.entity.Dept" column="dept_id" select="selectDept">
+        </association>
+        <association property="job" javaType="com.lym.entity.Job" column="job_id" select="selectJob">
+
+        </association>
+    </resultMap>
+
+    <select id="selectAllEmployee" resultMap="empmap">
+        select *
+        from employee,
+        dept,
+        job
+        <where>
+            employee.flag = 0
+            and dept_id = dept.id
+            and job_id = job.id
+            <if test="employee.job_id!=null and employee.job_id!=0">
+                and job_id=#{employee.job_id}
+            </if>
+            <if test="employee.sex!=null and employee.sex!=0">
+                and sex=#{employee.sex}
+            </if>
+            <if test="employee.dept_id!=null and employee.dept_id!=0">
+                and dept_id=#{employee.dept_id}
+            </if>
+            <if test="employee.name!=null and employee.name!=''">
+                and employee.name like concat('%',#{employee.name},'%')
+            </if>
+            <if test="employee.card_id!=null and employee.card_id!=''">
+                and card_id like concat('%',#{employee.card_id},'%')
+            </if>
+            <if test="employee.phone!=null and employee.phone!=''">
+                and phone=like concat('%',#{employee.phone},'%')
+            </if>
+        </where>
+        limit #{start},10
+    </select>
+    <select id="selectEmployee" resultType="com.lym.entity.Employee">
+        select *
+        from employee
+        where flag = 0
+          and id = #{id};
+    </select>
+    <insert id="addEmployee">
+        insert into employee(dept_id, job_id, name, card_id, address, post_code, tel, phone, qq_num, email, sex, party,
+                             birthday, race, education, speciality, hobby, remark,create_date)
+        values (#{dept_id}, #{job_id}, #{name}, #{card_id}, #{address}, #{post_code}, #{tel}, #{phone}, #{qq_num},
+                #{email}, #{sex}, #{party}, #{birthday}, #{race}, #{education}, #{speciality}, #{hobby}, #{remark},#{create_date})
+    </insert>
+
+    <update id="updateEmployee">
+        update employee
+        set job_id=#{job_id},
+            dept_id=#{dept_id},
+            name=#{name},
+            card_id=#{card_id},
+            address=#{address},
+            post_code=#{post_code},
+            tel=#{tel},
+            phone=#{phone},
+            qq_num=#{qq_num},
+            email=#{email},
+            sex=#{sex},
+            party=#{party},
+            birthday=#{birthday},
+            race=#{race},
+            education=#{education},
+            speciality=#{speciality},
+            hobby=#{hobby},
+            remark=#{remark}
+        where id = #{id}
+    </update>
+
+    <select id="selectDept" resultMap="deptmap">
+        select *
+        from dept
+        where id = #{id}
+    </select>
+    <select id="selectJob" resultMap="jobmap">
+        select *
+        from job
+        where id = #{id}
+    </select>
+
+    <update id="deleteEmployee">
+        update employee
+        set flag= 1
+        where id = #{id}
+    </update>
+    <select id="totalcountEmployee" parameterType="com.lym.entity.Employee" resultType="java.lang.Integer">
+        select count(1)
+        from employee,
+        dept,
+        job
+        <where>
+            employee.flag = 0
+            and dept_id = dept.id
+            and job_id = job.id
+            <if test="job_id!=null and job_id!=0">
+                and job_id=#{job_id}
+            </if>
+            <if test="sex!=null and sex!=0">
+                and sex=#{sex}
+            </if>
+            <if test="dept_id!=null and dept_id!=0">
+                and dept_id=#{dept_id}
+            </if>
+            <if test="name!=null and name!=''">
+                and employee.name like concat('%',#{name},'%')
+            </if>
+            <if test="card_id!=null and card_id!=''">
+                and card_id like concat('%',#{card_id},'%')
+            </if>
+            <if test="phone!=null and phone!=''">
+                and phone=like concat('%',#{phone},'%')
+            </if>
+        </where>
+    </select>
+</mapper>

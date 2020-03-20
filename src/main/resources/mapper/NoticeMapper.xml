@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lym.dao.NoticeMapper">
+
+    <resultMap id="noticemap" type="com.lym.entity.Notice" autoMapping="true">
+        <id property="id" column="id"/>
+        <association property="user" javaType="com.lym.entity.User" autoMapping="true">
+            <id property="id" column="id1"/>
+        </association>
+    </resultMap>
+    <select id="selectAllNotice" resultMap="noticemap">
+        select * from notice,user
+        <where>
+            notice.user_id=user.id and notice.flag=0
+            <if test="notice.title!=null">
+                and title like concat('%',#{notice.title},'%')
+            </if>
+            <if test="notice.content!=null">
+                and content like concat('%',#{notice.content},'%')
+            </if>
+        </where>
+        limit #{start},10
+    </select>
+    <select id="selectNotice" resultType="com.lym.entity.Notice">
+        select *
+        from notice
+        where id = #{id}
+    </select>
+    <insert id="addNotice">
+        insert into notice(title, content, create_date, user_id)
+        values (#{title}, #{content}, #{create_date}, #{user_id})
+    </insert>
+    <update id="updateNotice">
+        update notice
+        set title=#{title},
+            content=#{content}
+        where id = #{id}
+    </update>
+    <update id="delNotice">
+        update notice
+        set flag= 1
+        where id = #{id}
+    </update>
+    <select id="totalcountNotice" parameterType="com.lym.entity.Notice" resultType="java.lang.Integer">
+        select count(1)
+        from notice
+        <where>
+            flag=0
+            <if test="title!=null">
+                and title like concat('%',#{title},'%')
+            </if>
+            <if test="content!=null">
+                and content like concat('%',#{content},'%')
+            </if>
+        </where>
+    </select>
+</mapper>

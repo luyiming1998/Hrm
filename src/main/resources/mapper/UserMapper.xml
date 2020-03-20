@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lym.dao.UserMapper">
+
+    <resultMap id="userMap" type="com.lym.entity.User" autoMapping="true">
+        <id property="id" column="id"/>
+    </resultMap>
+
+    <select id="Login" resultType="com.lym.entity.User">
+        select *
+        from user
+        where loginname = #{loginname}
+          and password = #{password}
+          and flag = 0
+    </select>
+    <select id="selectAllUser" resultMap="userMap">
+        select * from user
+        <where>
+            flag=0
+            <if test="user.username!=null">
+                and username like concat('%',#{user.username},'%')
+            </if>
+            <if test="user.status!=null and user.status!=0">
+                and status=#{user.status}
+            </if>
+            <if test="user.id!=null and user.id!=0">
+                and id=#{user.id}
+            </if>
+        </where>
+        limit #{start},10
+    </select>
+    <select id="selectUpdateUser" resultType="com.lym.entity.User">
+        select *
+        from user
+        where id = #{id}
+    </select>
+    <insert id="addUser" parameterType="com.lym.entity.User">
+        insert into user(loginname, password, status, createdate, username)
+        values (#{loginName}, #{password}, #{status}, #{createDate}, #{username})
+    </insert>
+    <update id="updateUser">
+        update user
+        set loginname=#{loginName},
+            status=#{status},
+            username=#{username}
+        where id = #{id}
+    </update>
+
+    <update id="updatePwd">
+        update user
+        set password=#{password}
+        where id = #{id}
+    </update>
+
+    <delete id="delUser">
+        update user
+        set flag=1
+        where id = #{id}
+    </delete>
+    <select id="totalcountUser" parameterType="com.lym.entity.User" resultType="java.lang.Integer">
+        select count(1)
+        from user
+        <where>
+            flag=0
+            <if test="username!=null">
+                and username like concat('%',#{username},'%')
+            </if>
+            <if test="status!=null and status!=0">
+                and status=#{status}
+            </if>
+            <if test="id!=null and id!=0">
+                and id=#{id}
+            </if>
+        </where>
+    </select>
+
+    <select id="selectName" parameterType="String" resultType="java.lang.Integer">
+        select count(1) from user where loginname=#{loginname}
+    </select>
+</mapper>

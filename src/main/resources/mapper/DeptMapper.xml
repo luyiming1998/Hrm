@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lym.dao.DeptMapper">
+    <resultMap id="deptmap" type="com.lym.entity.Dept" autoMapping="true">
+        <id property="id" column="id"/>
+    </resultMap>
+    <select id="selectAllDept" resultMap="deptmap">
+        select *
+        from dept
+        <where>
+            flag=0
+            <if test="dept.name!=null">
+                and name like concat('%',#{dept.name},'%')
+            </if>
+        </where>
+        limit #{start},10
+    </select>
+    <select id="totalcountDept" resultType="java.lang.Integer">
+        select count(1)
+        from dept
+        <where>
+            flag=0
+            <if test="name!=null">
+                and name like concat('%',#{name},'%')
+            </if>
+        </where>
+    </select>
+    <insert id="addDept">
+        insert into dept(name, remark)
+        values (#{name}, #{remark})
+    </insert>
+
+    <delete id="delDept">
+        delete
+        from dept
+        where id = #{id}
+    </delete>
+    <select id="selectUpdateDept" resultType="com.lym.entity.Dept">
+        select *
+        from dept
+        where id = #{id}
+    </select>
+
+    <update id="updateDept">
+        update dept
+        set name=#{name},
+            remark=#{remark}
+        where id = #{id}
+    </update>
+
+    <select id="selectAll" resultMap="deptmap">
+        select *
+        from dept
+        where flag = 0
+    </select>
+
+    <select id="checkDeptName" parameterType="String" resultType="java.lang.Integer">
+        select count(1) from dept where name=#{name}
+    </select>
+</mapper>
